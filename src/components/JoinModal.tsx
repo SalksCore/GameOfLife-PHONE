@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useI18n } from '../i18n';
 import { CODE_ALPHABET, LIMITS, normalizeCode } from '../protocol';
+import { Icon } from './Icon';
 
 const allowed = new Set(CODE_ALPHABET);
 /** Ne garde que les caractères valides d'un code (majuscules, sans ambiguïtés) */
 export const cleanCode = (value: string) =>
   [...normalizeCode(value)].filter((c) => allowed.has(c)).join('').slice(0, LIMITS.codeLength);
 
-/** Modale centrale de saisie du code de partie. */
+/** Feuille de saisie du code de partie (remonte du bas de l'écran). */
 export function JoinModal({
   open,
   initialCode = '',
@@ -26,6 +27,7 @@ export function JoinModal({
   const { t } = useI18n();
   const [code, setCode] = useState(() => cleanCode(initialCode));
   const ref = useRef<HTMLDialogElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const complete = code.length === LIMITS.codeLength;
 
   useEffect(() => {
@@ -34,6 +36,7 @@ export function JoinModal({
     if (open && !d.open) {
       setCode(cleanCode(initialCode));
       d.showModal();
+      inputRef.current?.focus();
     }
     if (!open && d.open) d.close();
   }, [open, initialCode]);
@@ -44,14 +47,25 @@ export function JoinModal({
   }
 
   return (
-    <dialog ref={ref} className="join-modal" onClose={onClose} onCancel={onClose}>
-      <form onSubmit={submit}>
-        <button type="button" className="modal-close" onClick={onClose} aria-label={t('common.close')}>
-          ✕
-        </button>
-        <h2>{t('home.codeTitle')}</h2>
+    <dialog
+      ref={ref}
+      className="sheet"
+      onClose={onClose}
+      onCancel={onClose}
+      // Toucher le voile (en dehors de la feuille) ferme la saisie
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <form className="sheet-body" onSubmit={submit}>
+        <span className="sheet-grip" aria-hidden="true" />
+        <header className="sheet-head">
+          <h2>{t('home.codeTitle')}</h2>
+          <button type="button" className="icon-btn" onClick={onClose} aria-label={t('common.close')}>
+            <Icon name="close" />
+          </button>
+        </header>
+        <p className="muted">{t('home.codeHelp', { count: LIMITS.codeLength })}</p>
 
-        <div className="code-boxes" onClick={() => document.getElementById('code')?.focus()}>
+        <div className="code-boxes" onClick={() => inputRef.current?.focus()}>
           {Array.from({ length: LIMITS.codeLength }, (_, i) => (
             <span
               key={i}
@@ -62,29 +76,26 @@ export function JoinModal({
             </span>
           ))}
           <input
-            id="code"
+            ref={inputRef}
             className="code-hidden-input"
             value={code}
             onChange={(e) => setCode(cleanCode(e.target.value))}
-            autoComplete="off"
+            autoComplete="one-time-code"
             autoCorrect="off"
             autoCapitalize="characters"
             spellCheck={false}
             enterKeyHint="go"
             aria-label={t('home.codeTitle')}
-            autoFocus
           />
         </div>
 
-        <p className="code-help">{t('home.codeHelp', { count: LIMITS.codeLength })}</p>
-
         {error && (
-          <p className="game-error" role="alert">
+          <p className="alert alert-error" role="alert">
             {error}
           </p>
         )}
 
-        <button className="btn-play" disabled={!complete || busy}>
+        <button className="btn btn-primary btn-lg" disabled={!complete || busy}>
           {busy ? <span className="spinner" aria-label={t('common.loading')} /> : t('home.codeSubmit')}
         </button>
       </form>

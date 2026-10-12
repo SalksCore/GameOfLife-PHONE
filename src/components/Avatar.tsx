@@ -7,12 +7,12 @@ export function Avatar({
 }: {
   avatar: string;
   color: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   offline?: boolean;
 }) {
   return (
     <span className={`avatar avatar-${size}${offline ? ' offline' : ''}`} data-color={color} aria-hidden="true">
-      {avatar}
+      <span className="avatar-emoji">{avatar}</span>
     </span>
   );
 }

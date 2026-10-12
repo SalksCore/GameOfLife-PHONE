@@ -1,14 +1,7 @@
 import { useState } from 'react';
+import { Icon } from '../components/Icon';
+import { useI18n } from '../i18n';
 import type { Maintenance } from '../lib/status';
-
-const timeFmt = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit' });
-const dayFmt = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
-
-function eta(iso: string): string {
-  const d = new Date(iso);
-  const sameDay = d.toDateString() === new Date().toDateString();
-  return sameDay ? `vers ${timeFmt.format(d)}` : `le ${dayFmt.format(d)} vers ${timeFmt.format(d)}`;
-}
 
 /** Affiché à la place du jeu pendant une maintenance */
 export function MaintenanceScreen({
@@ -20,31 +13,44 @@ export function MaintenanceScreen({
   maintenance: Maintenance;
   onRetry: () => Promise<void>;
 }) {
+  const { t, locale } = useI18n();
   const [checking, setChecking] = useState(false);
 
+  function eta(iso: string): string {
+    const d = new Date(iso);
+    const time = d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
+    if (d.toDateString() === new Date().toDateString()) return t('maintenance.etaToday', { time });
+    const day = d.toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' });
+    return t('maintenance.etaDay', { day, time });
+  }
+
   return (
-    <main className="game-bg center-screen maintenance-screen">
-      <div className="maintenance-content">
-        <div className="maintenance-icon" aria-hidden="true">
-          🛠️
+    <main className="screen center-screen">
+      <div className="card state-card">
+        <p className="eyebrow">{gameName}</p>
+        <div className="state-icon wobble">
+          <Icon name="wrench" size={36} />
         </div>
-        <p className="maintenance-game">{gameName}</p>
-        <h1>Maintenance en cours</h1>
-        <p className="maintenance-message">{maintenance.message}</p>
+        <h1>{t('maintenance.title')}</h1>
+        <p className="state-message">{maintenance.message}</p>
         {maintenance.endsAt && new Date(maintenance.endsAt).getTime() > Date.now() && (
-          <p className="maintenance-eta">Retour prévu {eta(maintenance.endsAt)}</p>
+          <p className="pill pill-accent">
+            <Icon name="clock" size={16} />
+            {t('maintenance.eta', { when: eta(maintenance.endsAt) })}
+          </p>
         )}
         <button
-          className="btn-ghost"
+          className="btn btn-ghost"
           disabled={checking}
           onClick={() => {
             setChecking(true);
             void onRetry().finally(() => setChecking(false));
           }}
         >
-          {checking ? 'Vérification…' : 'Réessayer'}
+          <Icon name="refresh" size={18} />
+          {checking ? t('common.checking') : t('common.retry')}
         </button>
-        <p className="maintenance-hint">La page se rafraîchit automatiquement.</p>
+        <p className="footnote">{t('maintenance.auto')}</p>
       </div>
     </main>
   );

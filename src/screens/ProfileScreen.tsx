@@ -1,23 +1,20 @@
-import { useEffect, useState } from 'react';
-import { Avatar } from '../components/Avatar';
-import { useI18n } from '../i18n';
-import { logout, request, type User } from '../lib/api';
+import { useEffect, useRef, useState } from 'react';
 import { AVATARS, COLORS } from '../avatars';
+import { Avatar } from '../components/Avatar';
+import { Icon } from '../components/Icon';
+import { useI18n } from '../i18n';
+import type { TranslationKey } from '../i18n/fr';
+import { logout, request, type User } from '../lib/api';
 
-/** Profil du joueur : apparence (avatar + couleur), statistiques, déconnexion. */
-export function ProfileScreen({
-  user: initial,
-  onBack,
-  onUpdated,
-}: {
-  user: User;
-  onBack: () => void;
-  onUpdated: (user: User) => void;
-}) {
+/** Onglet « Profil » : carte du joueur, statistiques, apparence (avatar + couleur), compte. */
+export function ProfileScreen({ user: initial, onUpdated }: { user: User; onUpdated: (user: User) => void }) {
   const { t, locale } = useI18n();
   const [user, setUser] = useState(initial);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [confirmLogout, setConfirmLogout] = useState(false);
+  const lookRef = useRef<HTMLElement>(null);
+  const savedTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   // Statistiques à jour (elles évoluent après chaque partie)
   useEffect(() => {
@@ -28,101 +25,168 @@ export function ProfileScreen({
       },
       () => {},
     );
+    return () => clearTimeout(savedTimer.current);
     // onUpdated est stable (useCallback côté App)
   }, [onUpdated]);
 
   async function change(patch: { avatar?: string; color?: string }) {
     const previous = user;
-    const optimistic = { ...user, ...patch };
-    setUser(optimistic); // retour immédiat au toucher
+    setUser({ ...user, ...patch }); // retour immédiat au toucher
     setError(null);
     try {
       const fresh = await request<User>('PATCH', '/api/auth/me', patch);
       setUser(fresh);
       onUpdated(fresh);
       setSaved(true);
-      setTimeout(() => setSaved(false), 1_500);
+      clearTimeout(savedTimer.current);
+      savedTimer.current = setTimeout(() => setSaved(false), 1_600);
     } catch {
       setUser(previous);
       setError(t('profile.saveError'));
     }
   }
 
-  return (
-    <main className="game-bg profile-screen">
-      <header className="room-top">
-        <button className="btn-ghost" onClick={onBack}>
-          ← {t('common.back')}
-        </button>
-        {saved && <span className="saved-flag">{t('common.saved')} ✓</span>}
-      </header>
+  const since = new Date(user.createdAt);
+  const days = Math.max(1, Math.round((Date.now() - since.getTime()) / 86_400_000));
 
-      <div className="profile-id">
-        <Avatar avatar={user.avatar} color={user.color} size="lg" />
+  return (
+    <main className="screen with-tabbar profile-screen" data-color={user.color}>
+      <section className="profile-hero">
+        <button
+          className="hero-avatar"
+          onClick={() => lookRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+          aria-label={t('profile.appearance')}
+        >
+          <Avatar avatar={user.avatar} color={user.color} size="xl" />
+          <span className="edit-badge">
+            <Icon name="pencil" size={16} />
+          </span>
+        </button>
         <h1>
           {user.firstName} {user.lastName}
         </h1>
-        <p className="muted small">
-          {t('profile.identifier')} : <strong>{user.username}</strong>
+        <p className="handle">
+          <Icon name="at" size={15} />
+          {user.username}
         </p>
-      </div>
+      </section>
 
-      <section className="glass-card stack">
-        <h2 className="section-title">{t('profile.appearance')}</h2>
+      <section className="stat-grid">
+        <div className="stat-tile">
+          <span className="stat-icon">
+            <Icon name="trophy" />
+          </span>
+          <strong>{user.gamesPlayed}</strong>
+          <span>{user.gamesPlayed > 1 ? t('profile.gamesPlural') : t('profile.games')}</span>
+        </div>
+        <div className="stat-tile">
+          <span className="stat-icon">
+            <Icon name="calendar" />
+          </span>
+          <strong>{days}</strong>
+          <span>{days > 1 ? t('profile.daysPlural') : t('profile.days')}</span>
+        </div>
+      </section>
 
-        <div>
-          <p className="field-label">{t('profile.avatar')}</p>
-          <div className="picker avatars" role="radiogroup" aria-label={t('profile.avatar')}>
-            {AVATARS.map((a) => (
-              <button
-                key={a}
-                role="radio"
-                aria-checked={user.avatar === a}
-                className="pick-avatar"
-                onClick={() => void change({ avatar: a })}
-              >
-                {a}
-              </button>
-            ))}
-          </div>
+      <section ref={lookRef} className="card">
+        <header className="card-head">
+          <h2>{t('profile.appearance')}</h2>
+          <span className={`saved-flag${saved ? ' show' : ''}`} aria-live="polite">
+            {saved && (
+              <>
+                <Icon name="check" size={16} /> {t('common.saved')}
+              </>
+            )}
+          </span>
+        </header>
+
+        <p className="field-label">{t('profile.avatar')}</p>
+        <div className="avatar-grid" role="radiogroup" aria-label={t('profile.avatar')}>
+          {AVATARS.map((a) => (
+            <button
+              key={a}
+              role="radio"
+              aria-checked={user.avatar === a}
+              className="pick-avatar"
+              data-color={user.color}
+              onClick={() => user.avatar !== a && void change({ avatar: a })}
+            >
+              {a}
+            </button>
+          ))}
         </div>
 
-        <div>
-          <p className="field-label">{t('profile.color')}</p>
-          <div className="picker colors" role="radiogroup" aria-label={t('profile.color')}>
-            {COLORS.map((c) => (
-              <button
-                key={c}
-                role="radio"
-                aria-checked={user.color === c}
-                aria-label={c}
-                className="pick-color"
-                data-color={c}
-                onClick={() => void change({ color: c })}
-              />
-            ))}
-          </div>
+        <p className="field-label">{t('profile.color')}</p>
+        <div className="color-row" role="radiogroup" aria-label={t('profile.color')}>
+          {COLORS.map((c) => (
+            <button
+              key={c}
+              role="radio"
+              aria-checked={user.color === c}
+              aria-label={t(`color.${c}` as TranslationKey)}
+              title={t(`color.${c}` as TranslationKey)}
+              className="pick-color"
+              data-color={c}
+              onClick={() => user.color !== c && void change({ color: c })}
+            >
+              <Icon name="check" size={18} />
+            </button>
+          ))}
         </div>
 
         {error && (
-          <p className="game-error" role="alert">
+          <p className="alert alert-error" role="alert">
             {error}
           </p>
         )}
       </section>
 
-      <div className="stat-block glass-card">
-        <strong>{user.gamesPlayed}</strong>
-        <span>{user.gamesPlayed > 1 ? t('profile.gamesPlural') : t('profile.games')}</span>
-      </div>
+      <section className="card list-card">
+        <h2 className="list-title">{t('profile.account')}</h2>
+        <div className="list-row">
+          <Icon name="user" />
+          <span>{t('profile.fullName')}</span>
+          <strong>
+            {user.firstName} {user.lastName}
+          </strong>
+        </div>
+        <div className="list-row">
+          <Icon name="at" />
+          <span>{t('profile.identifier')}</span>
+          <strong className="mono">{user.username}</strong>
+        </div>
+        <div className="list-row">
+          <Icon name="users" />
+          <span>{t('profile.inGameName')}</span>
+          <strong>{user.displayName}</strong>
+        </div>
+        <div className="list-row">
+          <Icon name="calendar" />
+          <span>{t('profile.memberSince')}</span>
+          <strong>{since.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })}</strong>
+        </div>
+      </section>
 
-      <p className="muted small center-text">
-        {t('profile.since', { date: new Date(user.createdAt).toLocaleDateString(locale) })}
-      </p>
+      {confirmLogout ? (
+        <div className="card confirm-card">
+          <p>{t('profile.logoutConfirm')}</p>
+          <div className="row-2">
+            <button className="btn btn-ghost" onClick={() => setConfirmLogout(false)}>
+              {t('common.cancel')}
+            </button>
+            <button className="btn btn-danger" onClick={() => void logout()}>
+              {t('common.logout')}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button className="btn btn-danger-soft" onClick={() => setConfirmLogout(true)}>
+          <Icon name="logout" size={20} />
+          {t('common.logout')}
+        </button>
+      )}
 
-      <button className="btn-danger" onClick={() => void logout()}>
-        {t('common.logout')}
-      </button>
+      <p className="footnote">{t('profile.managedBy')}</p>
     </main>
   );
 }

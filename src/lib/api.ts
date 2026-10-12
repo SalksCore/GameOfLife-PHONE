@@ -13,6 +13,10 @@ export interface User {
   lastName: string;
   /** Nom affiché en jeu, ex. Jean D. */
   displayName: string;
+  /** Emoji choisi parmi AVATARS */
+  avatar: string;
+  /** Couleur choisie parmi COLORS */
+  color: string;
   gamesPlayed: number;
   createdAt: string;
 }
@@ -48,6 +52,11 @@ function setSession(session: Session | null) {
   accessToken = session?.accessToken ?? null;
   expiresAt = session ? readExp(session.accessToken) : 0;
   listeners.forEach((fn) => fn(session?.account ?? null));
+}
+
+/** Met à jour le compte affiché (après une modification du profil), sans toucher au token. */
+export function updateAccount(user: User) {
+  listeners.forEach((fn) => fn(user));
 }
 
 function readExp(jwt: string): number {
