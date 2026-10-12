@@ -60,6 +60,11 @@ export const en: Record<keyof typeof fr, string> = {
   'room.send': 'Send',
   'room.message': 'Message',
   'room.online': 'online',
+  'room.code': 'Game code',
+  'room.copyLink': 'Tap to copy the invite link',
+  'room.copied': 'Link copied!',
+  'room.waitingHost': 'Waiting for the host',
+  'room.seats': 'Seats',
   'room.chatEmpty': 'No messages yet. Say hi!',
 
   'phase.lobby': 'Lobby',

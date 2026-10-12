@@ -58,6 +58,11 @@ export const fr = {
   'room.send': 'Envoyer',
   'room.message': 'Message',
   'room.online': 'en ligne',
+  'room.code': 'Code de la partie',
+  'room.copyLink': 'Toucher pour copier le lien d’invitation',
+  'room.copied': 'Lien copié !',
+  'room.waitingHost': 'En attente de l’organisateur',
+  'room.seats': 'Places',
   'room.chatEmpty': 'Aucun message pour l’instant. Dis bonjour !',
 
   'phase.lobby': 'Salle d’attente',

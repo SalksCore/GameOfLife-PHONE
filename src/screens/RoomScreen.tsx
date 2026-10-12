@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Avatar } from '../components/Avatar';
 import { Chat } from '../components/Chat';
-import { Icon, type IconName } from '../components/Icon';
+import { Icon } from '../components/Icon';
 import { useI18n } from '../i18n';
 import { useGame } from '../lib/game';
 import { useSession } from '../lib/session';
-import type { RoomView } from '../protocol';
+import type { PlayerView, RoomView } from '../protocol';
 
 function Elapsed({ since, offset }: { since: number; offset: number }) {
   const [now, setNow] = useState(() => Date.now() + offset);
@@ -21,7 +21,79 @@ function Elapsed({ since, offset }: { since: number; offset: number }) {
   );
 }
 
-/** Écran de partie (socle neutre : salle d'attente, partie en cours, fin). */
+/** Code de la partie en grand ; un toucher copie le lien d'invitation. */
+function ShareCode({ code }: { code: string }) {
+  const { t } = useI18n();
+  const [copied, setCopied] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => () => clearTimeout(timer.current), []);
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(`${location.origin}/?code=${code}`);
+      setCopied(true);
+      clearTimeout(timer.current);
+      timer.current = setTimeout(() => setCopied(false), 1_800);
+    } catch {
+      // Presse-papiers indisponible (contexte non sécurisé) : le code reste lisible à l'écran
+    }
+  }
+
+  return (
+    <button className="share-code" onClick={() => void copy()} aria-label={`${t('room.code')} ${code}`}>
+      <span className="share-label">{t('room.code')}</span>
+      <span className="share-chars" aria-hidden="true">
+        {[...code].map((c, i) => (
+          <span key={i}>{c}</span>
+        ))}
+      </span>
+      <span className={`share-hint${copied ? ' done' : ''}`}>
+        {copied ? (
+          <>
+            <Icon name="check" size={14} /> {t('room.copied')}
+          </>
+        ) : (
+          t('room.copyLink')
+        )}
+      </span>
+    </button>
+  );
+}
+
+/** Places de la salle : les joueurs « prennent vie » dans les cellules vides. */
+function Seats({ room, meId }: { room: RoomView; meId: string | undefined }) {
+  const { t } = useI18n();
+  const n = room.players.length;
+  const visible = Math.min(room.maxPlayers, Math.max(8, Math.ceil((n + 1) / 4) * 4));
+  const seats: (PlayerView | null)[] = [...room.players, ...Array<null>(Math.max(0, visible - n)).fill(null)];
+
+  return (
+    <section className="seats">
+      <h3 className="section-label">
+        {t('room.seats')}
+        <span>
+          {n}/{room.maxPlayers}
+        </span>
+      </h3>
+      <ul className="seat-grid">
+        {seats.map((p, i) =>
+          p ? (
+            <li key={p.id} className={`seat taken${p.id === meId ? ' me' : ''}${p.connected ? '' : ' away'}`}>
+              <Avatar avatar={p.avatar} color={p.color} size="md" offline={!p.connected} />
+              <span>{p.id === meId ? t('room.you') : p.displayName}</span>
+            </li>
+          ) : (
+            <li key={`free-${i}`} className="seat free" aria-hidden="true">
+              <span className="seat-dot" />
+            </li>
+          ),
+        )}
+      </ul>
+    </section>
+  );
+}
+
+/** Écran de partie : salle d'attente, partie en cours, fin. */
 export function RoomScreen({ room }: { room: RoomView }) {
   const { t, tServer } = useI18n();
   const { user } = useSession();
@@ -33,15 +105,6 @@ export function RoomScreen({ room }: { room: RoomView }) {
     if (!res.ok) setError(tServer(res.error));
   }
 
-  const stages: Record<RoomView['phase'], { icon: IconName; title: string; sub: string }> = {
-    lobby: { icon: 'hourglass', title: t('room.waiting'), sub: t('room.waitingSub') },
-    playing: { icon: 'bolt', title: t('room.playing'), sub: t('room.playingSub') },
-    ended: { icon: 'flag', title: t('room.ended'), sub: t('room.endedSub') },
-  };
-  const stage = stages[room.phase];
-
-  const online = room.players.filter((p) => p.connected).length;
-
   return (
     <main className={`screen room-screen phase-${room.phase}`}>
       <header className="top-bar">
@@ -50,7 +113,10 @@ export function RoomScreen({ room }: { room: RoomView }) {
         </button>
         <div className="room-title">
           <strong>{room.name}</strong>
-          <span className="code-pill">{room.code}</span>
+          <span className="room-state">
+            <span className="live-dot" />
+            {room.phase === 'lobby' ? t('room.waitingHost') : t(`phase.${room.phase}`)}
+          </span>
         </div>
         <span className="pill">
           {room.phase === 'playing' && room.startedAt ? (
@@ -61,46 +127,44 @@ export function RoomScreen({ room }: { room: RoomView }) {
           ) : (
             <>
               <Icon name="users" size={16} />
-              {room.players.length}/{room.maxPlayers}
+              {room.players.length}
             </>
           )}
         </span>
       </header>
 
-      <section className="phase-card">
-        <div className="phase-icon">
-          <Icon name={stage.icon} size={30} />
-        </div>
-        <div className="phase-text">
-          <p className="eyebrow">{t(`phase.${room.phase}`)}</p>
-          <h2>{stage.title}</h2>
-          <p>{stage.sub}</p>
-        </div>
-      </section>
-      {room.phase === 'ended' && (
-        <button className="btn btn-primary btn-lg" onClick={() => void leave()}>
-          {t('room.backHome')}
-        </button>
+      {room.phase === 'lobby' && (
+        <>
+          <ShareCode code={room.code} />
+          <Seats room={room} meId={user?.id} />
+        </>
       )}
+
+      {room.phase !== 'lobby' && (
+        <>
+          <section className="phase-banner">
+            <h2>{room.phase === 'playing' ? t('room.playing') : t('room.ended')}</h2>
+            <p>{room.phase === 'playing' ? t('room.playingSub') : t('room.endedSub')}</p>
+          </section>
+          {room.phase === 'ended' && (
+            <button className="btn btn-primary btn-lg" onClick={() => void leave()}>
+              {t('room.backHome')}
+            </button>
+          )}
+          <section className="roster">
+            <ul>
+              {room.players.map((p) => (
+                <li key={p.id} className={`${p.id === user?.id ? 'me' : ''}${p.connected ? '' : ' away'}`}>
+                  <Avatar avatar={p.avatar} color={p.color} size="md" offline={!p.connected} />
+                  <span className="roster-name">{p.id === user?.id ? t('room.you') : p.displayName}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </>
+      )}
+
       {error && <p className="alert alert-error">{error}</p>}
-
-      <section className="roster">
-        <h3 className="section-label">
-          {t('room.players')}
-          <span>
-            {online} {t('room.online')}
-          </span>
-        </h3>
-        <ul>
-          {room.players.map((p) => (
-            <li key={p.id} className={`${p.id === user?.id ? 'me' : ''}${p.connected ? '' : ' away'}`}>
-              <Avatar avatar={p.avatar} color={p.color} size="md" offline={!p.connected} />
-              <span className="roster-name">{p.id === user?.id ? t('room.you') : p.displayName}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
       <Chat />
     </main>
   );
