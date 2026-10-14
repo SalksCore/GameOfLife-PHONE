@@ -8,6 +8,7 @@ import { StatusProvider } from './lib/status';
 import '@fontsource-variable/bricolage-grotesque';
 import '@fontsource-variable/dm-sans';
 import './styles.css';
+import './game.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

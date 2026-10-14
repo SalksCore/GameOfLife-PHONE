@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { AVATARS, COLORS } from '../avatars';
+import { AppearancePicker } from '../components/AppearancePicker';
 import { Avatar } from '../components/Avatar';
 import { Icon } from '../components/Icon';
 import { useI18n } from '../i18n';
-import type { TranslationKey } from '../i18n/fr';
 import { logout, request, type User } from '../lib/api';
 
 /** Onglet « Profil » : carte du joueur, statistiques, apparence (avatar + couleur), compte. */
@@ -100,39 +99,7 @@ export function ProfileScreen({ user: initial, onUpdated }: { user: User; onUpda
           </span>
         </header>
 
-        <p className="field-label">{t('profile.avatar')}</p>
-        <div className="avatar-grid" role="radiogroup" aria-label={t('profile.avatar')}>
-          {AVATARS.map((a) => (
-            <button
-              key={a}
-              role="radio"
-              aria-checked={user.avatar === a}
-              className="pick-avatar"
-              data-color={user.color}
-              onClick={() => user.avatar !== a && void change({ avatar: a })}
-            >
-              {a}
-            </button>
-          ))}
-        </div>
-
-        <p className="field-label">{t('profile.color')}</p>
-        <div className="color-row" role="radiogroup" aria-label={t('profile.color')}>
-          {COLORS.map((c) => (
-            <button
-              key={c}
-              role="radio"
-              aria-checked={user.color === c}
-              aria-label={t(`color.${c}` as TranslationKey)}
-              title={t(`color.${c}` as TranslationKey)}
-              className="pick-color"
-              data-color={c}
-              onClick={() => user.color !== c && void change({ color: c })}
-            >
-              <Icon name="check" size={18} />
-            </button>
-          ))}
-        </div>
+        <AppearancePicker avatar={user.avatar} color={user.color} onChange={(patch) => void change(patch)} />
 
         {error && (
           <p className="alert alert-error" role="alert">
