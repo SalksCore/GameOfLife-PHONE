@@ -9,6 +9,7 @@ import '@fontsource-variable/bricolage-grotesque';
 import '@fontsource-variable/dm-sans';
 import './styles.css';
 import './game.css';
+import './play.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
