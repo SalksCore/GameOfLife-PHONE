@@ -1,3 +1,5 @@
+import { LegalLinks } from '../components/Legal';
+import { PLAYER_NOTICE } from '../legal';
 import { useActionState, useState } from 'react';
 import { Icon } from '../components/Icon';
 import { LifeGrid } from '../components/LifeGrid';
@@ -96,7 +98,17 @@ export function LoginScreen() {
         </button>
       </form>
 
+      <section className="card notice-card" aria-label="Avant de jouer">
+        <h2>🔒 Avant de jouer</h2>
+        <ul>
+          {PLAYER_NOTICE.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+      </section>
+
       <p className="footnote">{t('login.help')}</p>
+      <LegalLinks />
     </main>
   );
 }

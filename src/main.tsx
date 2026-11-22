@@ -10,6 +10,7 @@ import '@fontsource-variable/dm-sans';
 import './styles.css';
 import './game.css';
 import './play.css';
+import './expo.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -1,3 +1,4 @@
+import { LegalLinks } from '../components/Legal';
 import { Icon } from '../components/Icon';
 import { LANGUAGES, useI18n, type Language } from '../i18n';
 import { usePrefs } from '../lib/prefs';
@@ -67,6 +68,12 @@ export function SettingsScreen() {
             onChange={(e) => setPref('powerSaver', e.target.checked)}
           />
         </label>
+      </section>
+
+      <section className="card list-card">
+        <h2 className="list-title">Informations légales</h2>
+        <p className="muted small-print">Tes données sont supprimées 3 mois après la partie. Questions : salks.pro@gmail.com</p>
+        <LegalLinks className="in-card" />
       </section>
 
       <p className="footnote">{t('settings.storage')}</p>

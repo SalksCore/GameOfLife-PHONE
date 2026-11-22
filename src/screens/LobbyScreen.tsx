@@ -73,6 +73,8 @@ export function LobbyScreen({ room }: { room: RoomView }) {
 
       <p className="lobby-hint">{t('lobby.wait')}</p>
 
+      <Pairing room={room} meId={me.id} onError={setError} />
+
       <section className="card">
         <header className="card-head">
           <h2>{t('lobby.customize')}</h2>
@@ -93,5 +95,89 @@ export function LobbyScreen({ room }: { room: RoomView }) {
         {t('room.code')} : <strong className="mono">{room.code}</strong>
       </p>
     </main>
+  );
+}
+
+/** Binôme : deux comptes, un seul personnage, chacun peut jouer */
+function Pairing({ room, meId, onError }: { room: RoomView; meId: string; onError: (e: string | null) => void }) {
+  const { call } = useGame();
+  const { tServer } = useI18n();
+  const [open, setOpen] = useState(false);
+  const p = room.pairing;
+  const byId = new Map(room.players.map((x) => [x.id, x]));
+  const partner = p.partnerId ? byId.get(p.partnerId) : null;
+  const act = async (action: 'request' | 'accept' | 'decline' | 'leave', playerId: string | null) => {
+    const res = await call('room:pair', { action, playerId });
+    onError(res.ok ? null : tServer(res.error));
+    if (res.ok) setOpen(false);
+  };
+  const others = room.players.filter((x) => x.id !== meId);
+
+  return (
+    <section className="card pair-card">
+      <header className="card-head">
+        <h2>🤝 Jouer en binôme</h2>
+      </header>
+      {partner ? (
+        <div className="pair-row">
+          <Avatar avatar={partner.avatar} color={partner.color} size="sm" />
+          <p>
+            Tu joues avec <strong>{partner.displayName}</strong> : un seul personnage, chacun peut jouer.
+          </p>
+          <button className="btn btn-ghost small" onClick={() => void act('leave', null)}>
+            Se séparer
+          </button>
+        </div>
+      ) : (
+        <>
+          {p.requestsFrom.map((id) => {
+            const x = byId.get(id);
+            if (!x) return null;
+            return (
+              <div key={id} className="pair-row incoming">
+                <Avatar avatar={x.avatar} color={x.color} size="sm" />
+                <p>
+                  <strong>{x.displayName}</strong> veut jouer avec toi
+                </p>
+                <button className="btn btn-primary small" onClick={() => void act('accept', id)}>
+                  Accepter
+                </button>
+                <button className="btn btn-ghost small" onClick={() => void act('decline', id)}>
+                  Non
+                </button>
+              </div>
+            );
+          })}
+          {p.requestedTo ? (
+            <div className="pair-row">
+              <span className="spinner tiny" />
+              <p>
+                Demande envoyée à <strong>{byId.get(p.requestedTo)?.displayName}</strong>…
+              </p>
+              <button className="btn btn-ghost small" onClick={() => void act('decline', null)}>
+                Annuler
+              </button>
+            </div>
+          ) : open ? (
+            <ul className="pair-list">
+              {others.length === 0 && <li className="muted">Personne d’autre pour l’instant.</li>}
+              {others.map((x) => (
+                <li key={x.id}>
+                  <button onClick={() => void act('request', x.id)}>
+                    <Avatar avatar={x.avatar} color={x.color} size="sm" />
+                    <span>{x.displayName}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <button className="btn btn-ghost" onClick={() => setOpen(true)}>
+              Choisir un partenaire
+            </button>
+          )}
+          <p className="muted small-print">Pratique si un téléphone n’a plus de batterie. Ton partenaire doit accepter.</p>
+        </>
+      )}
+    </section>
   );
 }
