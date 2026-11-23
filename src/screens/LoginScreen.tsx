@@ -72,7 +72,10 @@ export function LoginScreen() {
               name="password"
               type={showPassword ? 'text' : 'password'}
               autoComplete="current-password"
-              placeholder="Tigre-Lune-Cactus-1234"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              placeholder="k7mx p4rz"
               required
               maxLength={128}
             />
