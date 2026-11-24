@@ -1,6 +1,7 @@
 import { LegalLinks } from '../components/Legal';
 import { PLAYER_NOTICE } from '../legal';
 import { useActionState, useState } from 'react';
+import { GameIcon } from '../components/GameIcon';
 import { Icon } from '../components/Icon';
 import { LifeGrid } from '../components/LifeGrid';
 import { LogoMark } from '../components/Logo';
@@ -103,7 +104,9 @@ export function LoginScreen() {
       </form>
 
       <section className="card notice-card" aria-label="Avant de jouer">
-        <h2>🔒 Avant de jouer</h2>
+        <h2>
+<GameIcon name="lock" /> Avant de jouer
+</h2>
         <ul>
           {PLAYER_NOTICE.map((line) => (
             <li key={line}>{line}</li>

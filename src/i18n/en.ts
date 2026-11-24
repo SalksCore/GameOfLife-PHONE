@@ -32,7 +32,7 @@ export const en: Record<keyof typeof fr, string> = {
   'login.help': 'No account yet? Your credentials are given to you by the host.',
   'login.failed': 'Unable to log in',
 
-  'home.hello': 'Hi {name} 👋',
+  'home.hello': 'Hi {name}',
   'home.subtitle': 'Enter the code from the host to join the room.',
   'home.join': 'Join a game',
   'home.profile': 'My profile',

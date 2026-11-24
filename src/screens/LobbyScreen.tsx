@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { AppearancePicker } from '../components/AppearancePicker';
 import { Avatar } from '../components/Avatar';
+import { GameIcon } from '../components/GameIcon';
 import { Icon } from '../components/Icon';
 import { useI18n } from '../i18n';
 import { request, updateAccount, type User } from '../lib/api';
@@ -126,7 +127,9 @@ function Pairing({ room, onError }: { room: RoomView; meId: string; onError: (e:
   return (
     <section className="card pair-card">
       <header className="card-head">
-        <h2>🤝 Jouer en binôme</h2>
+        <h2>
+<GameIcon name="handshake" /> Jouer en binôme
+</h2>
       </header>
       {partner ? (
         <div className="pair-row">

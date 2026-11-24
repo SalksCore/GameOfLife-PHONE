@@ -51,7 +51,7 @@ export function Chat() {
             <li key={m.id} className={`msg${mine ? ' mine' : ''}${grouped ? ' grouped' : ''}`}>
               {!mine && (
                 <span className="msg-avatar">
-                  {!grouped && <Avatar avatar={author?.avatar ?? '🙂'} color={author?.color ?? 'violet'} size="xs" />}
+                  {!grouped && <Avatar avatar={author?.avatar ?? 'p:00000000'} color={author?.color ?? 'violet'} size="xs" />}
                 </span>
               )}
               <div className="bubble" data-color={mine ? undefined : author?.color}>

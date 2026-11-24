@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Avatar } from '../components/Avatar';
+import { GameIcon } from '../components/GameIcon';
 import { useGame } from '../lib/game';
 import { useSession } from '../lib/session';
 import {
@@ -97,10 +98,10 @@ export function GameScreen({ room, game }: { room: RoomView; game: PlayerGameVie
       {c && (
         <nav className="gx-tabs" aria-label="Navigation de la partie">
           <button className={tab === 'play' ? 'on' : ''} onClick={() => setTab('play')}>
-            <span aria-hidden="true">🎮</span> Jouer
+            <span aria-hidden="true"><GameIcon name="gamepad" /></span> Jouer
           </button>
           <button className={tab === 'path' ? 'on' : ''} onClick={() => setTab('path')}>
-            <span aria-hidden="true">🧭</span> Mon parcours
+            <span aria-hidden="true"><GameIcon name="compass" /></span> Mon parcours
           </button>
         </nav>
       )}
@@ -108,7 +109,7 @@ export function GameScreen({ room, game }: { room: RoomView; game: PlayerGameVie
       {game.flash && <Flash key={game.flash.id} text={game.flash.text} />}
       {game.timer.paused && !game.step.replay && (
         <div className="gx-pause" role="status">
-          <span aria-hidden="true">⏸</span>
+          <span aria-hidden="true"><GameIcon name="pause" /></span>
           <strong>Partie en pause</strong>
           <p>L’organisateur explique quelque chose. Regarde l’écran.</p>
         </div>
@@ -140,7 +141,7 @@ function TopBar({ game, offset, character }: { game: PlayerGameView; offset: num
             <circle cx="18" cy="18" r="15.5" className="track" />
             <circle cx="18" cy="18" r="15.5" className="bar" style={{ strokeDashoffset: `${(1 - ratio) * 97.4}` }} />
           </svg>
-          <span>{paused ? '⏸' : secs}</span>
+          <span>{paused ? <GameIcon name="pause" weight="fill" /> : secs}</span>
         </div>
       )}
       {character && (
@@ -170,17 +171,17 @@ function Gauges({ c }: { c: CharacterView }) {
   return (
     <section className="gx-gauges" aria-label="Tes jauges">
       <div className={`gx-g ${bump.grade ?? ''}`}>
-        <span aria-hidden="true">📚</span>
+        <span aria-hidden="true"><GameIcon name="books" /></span>
         <strong>{grade(s.grade)}</strong>
         <small>moyenne</small>
       </div>
       <div className={`gx-g ${bump.contacts ?? ''}`}>
-        <span aria-hidden="true">🤝</span>
+        <span aria-hidden="true"><GameIcon name="handshake" /></span>
         <strong>{grade(s.contacts)}</strong>
         <small>contacts</small>
       </div>
       <div className={`gx-g ${bump.energy ?? ''}`}>
-        <span aria-hidden="true">🔋</span>
+        <span aria-hidden="true"><GameIcon name="battery" /></span>
         <span className="gx-pips" aria-label={`Énergie ${grade(s.energy)} sur 5`}>
           {[0, 1, 2, 3, 4].map((i) => (
             <i key={i} className={s.energy >= i + 1 ? 'full' : s.energy > i ? 'half' : ''} />
@@ -189,7 +190,7 @@ function Gauges({ c }: { c: CharacterView }) {
         <small>énergie</small>
       </div>
       <div className={`gx-g ${bump.budget ?? ''}${s.budget < 0 ? ' debt' : ''}`}>
-        <span aria-hidden="true">💶</span>
+        <span aria-hidden="true"><GameIcon name="money" /></span>
         <strong>{money(s.budget)}</strong>
         <small>budget</small>
       </div>
@@ -311,7 +312,7 @@ function Vote({ vote }: { vote: VoteView }) {
             aria-pressed={vote.myVote === o.id}
           >
             <span className="gx-option-emoji" aria-hidden="true">
-              {o.emoji}
+              <GameIcon name={o.icon} />
             </span>
             <span>
               <strong>{o.label}</strong>
@@ -344,7 +345,7 @@ function FamilyCard({ c }: { c: CharacterView }) {
         aria-label={flipped ? CLASS_LABELS[c.origin] : 'Retourner ta carte de famille'}
       >
         <span className="gx-fcard-back" aria-hidden={flipped}>
-          <span className="gx-fcard-dice">🎲</span>
+          <span className="gx-fcard-dice"><GameIcon name="dice" /></span>
           <strong>Ta famille</strong>
           <small>Touche pour découvrir où tu es né·e</small>
         </span>
@@ -370,11 +371,14 @@ function FamilyCard({ c }: { c: CharacterView }) {
             </span>
           </span>
           <span className="gx-fcard-list">
-            <span>🏫 {f.school}</span>
-            <span>👪 Tes parents paient {Math.round(f.support * 100)} % de tes études</span>
-            <span>{f.informed ? '🧭 Tu connais les filières sélectives' : '🌫️ Personne ne t’a parlé des filières sélectives'}</span>
-            <span>🎁 Don à l’entrée dans la vie active : {money(f.gift)}</span>
-            {f.forced && <span className="warn">⏳ {f.forced}</span>}
+            <span><GameIcon name="school" /> {f.school}</span>
+            <span><GameIcon name="family" /> Tes parents paient {Math.round(f.support * 100)} % de tes études</span>
+            <span>
+       <GameIcon name={f.informed ? 'compass' : 'fog'} />{' '}
+       {f.informed ? 'Tu connais les filières sélectives' : 'Personne ne t’a parlé des filières sélectives'}
+     </span>
+            <span><GameIcon name="gift" /> Don à l’entrée dans la vie active : {money(f.gift)}</span>
+            {f.forced && <span className="warn"><GameIcon name="hourglass" /> {f.forced}</span>}
           </span>
         </span>
       </div>
@@ -446,21 +450,21 @@ function YearPlay({ year, c }: { year: YearView; c: CharacterView }) {
           <div className="gx-slots" aria-label={`${placed + forcedCount} jetons placés sur ${year.totalTokens}`}>
             {forcedCats.map((f, i) => (
               <span key={`f${i}`} className="gx-slot forced" title={f.reason}>
-                {f.category === 'famille' ? '🏠' : '🧾'}
+                <GameIcon name={f.category === 'famille' ? 'home' : 'receipt'} />
               </span>
             ))}
             {Array.from({ length: free }, (_, i) => {
               const cat = year.categories.flatMap((x) => Array.from({ length: tokens[x.id] ?? 0 }, () => x))[i];
               return (
                 <span key={i} className={`gx-slot${cat ? ' filled' : ''}`}>
-                  {cat?.emoji ?? ''}
+                  {cat && <GameIcon name={cat.icon} />}
                 </span>
               );
             })}
           </div>
           {year.forced.map((f) => (
             <p key={f.category} className="gx-forced">
-              🔒 {f.count} jeton{f.count > 1 ? 's' : ''} imposé{f.count > 1 ? 's' : ''} : {f.reason}
+              <GameIcon name="lock" /> {f.count} jeton{f.count > 1 ? 's' : ''} imposé{f.count > 1 ? 's' : ''} : {f.reason}
             </p>
           ))}
           <ul className="gx-cats">
@@ -469,7 +473,7 @@ function YearPlay({ year, c }: { year: YearView; c: CharacterView }) {
               return (
                 <li key={cat.id} className={n ? 'on' : ''}>
                   <span className="gx-cat-emoji" aria-hidden="true">
-                    {cat.emoji}
+                    <GameIcon name={cat.icon} />
                   </span>
                   <span className="gx-cat-text">
                     <strong>{cat.label}</strong>
@@ -488,7 +492,7 @@ function YearPlay({ year, c }: { year: YearView; c: CharacterView }) {
               );
             })}
           </ul>
-          {c.stats.energy < 3 && year.stage !== 'travail' && <Hint>🔋 Énergie basse : ton travail rapportera moins. Pense au repos.</Hint>}
+          {c.stats.energy < 3 && year.stage !== 'travail' && <Hint><GameIcon name="battery" /> Énergie basse : ton travail rapportera moins. Pense au repos.</Hint>}
           <button className="gx-cta" disabled={placed < free} onClick={() => setPart(year.mini ? 'mini' : 'choice')}>
             {placed < free ? `Encore ${free - placed} jeton${free - placed > 1 ? 's' : ''} à placer` : year.mini ? `Continuer : ${year.mini.title} →` : 'Continuer : ma décision →'}
           </button>
@@ -498,7 +502,7 @@ function YearPlay({ year, c }: { year: YearView; c: CharacterView }) {
       ) : (
         <div className="gx-card">
           <p className="gx-kicker">
-            {year.decision.emoji} {year.decision.title}
+            <GameIcon name={year.decision.icon} /> {year.decision.title}
           </p>
           <p className="gx-lead">{year.decision.text}</p>
           <div className="gx-options">
@@ -511,7 +515,7 @@ function YearPlay({ year, c }: { year: YearView; c: CharacterView }) {
                 onClick={() => void send({ type: 'decide', optionId: o.id })}
               >
                 <span className="gx-option-emoji" aria-hidden="true">
-                  {o.locked ? '🔒' : o.emoji}
+                  <GameIcon name={o.locked ? 'lock' : o.icon} />
                 </span>
                 <span>
                   <strong>{o.label}</strong>
@@ -541,7 +545,7 @@ function MiniGame({ mini, send, onNext }: { mini: MiniGameView; send: Send; onNe
     <div className={`gx-card gx-mini kind-${mini.kind}`}>
       <header className="gx-mini-head">
         <span className="gx-mini-emoji" aria-hidden="true">
-          {mini.emoji}
+          <GameIcon name={mini.icon} />
         </span>
         <div>
           <strong>{mini.title}</strong>
@@ -576,7 +580,7 @@ function MiniCards({ mini, send }: { mini: MiniGameView; send: Send }) {
       </div>
       <article className="gx-mcard" key={it.id}>
         <span className="gx-mcard-emoji" aria-hidden="true">
-          {it.emoji}
+          <GameIcon name={it.icon} />
         </span>
         <h3>{it.title}</h3>
         <p>{it.text}</p>
@@ -585,7 +589,7 @@ function MiniCards({ mini, send }: { mini: MiniGameView; send: Send }) {
             <button key={o.id} className={`gx-mopt${mini.answers[it.id] === o.id ? ' on' : ''}`} disabled={!!o.locked} onClick={() => void pick(o.id)}>
               <span>{o.label}</span>
               {(o.cost !== null || o.hint) && <small>{[o.cost !== null ? (o.cost ? `−${money(o.cost)}` : 'payé par tes parents') : '', o.hint].filter(Boolean).join(' · ')}</small>}
-              {o.locked && <small className="gx-lock">🔒 {o.locked}</small>}
+              {o.locked && <small className="gx-lock"><GameIcon name="lock" /> {o.locked}</small>}
             </button>
           ))}
         </div>
@@ -611,7 +615,7 @@ function MiniBudget({ mini, send }: { mini: MiniGameView; send: Send }) {
       {mini.items.map((it) => (
         <div key={it.id} className="gx-mrow">
           <p>
-            <span aria-hidden="true">{it.emoji}</span> {it.title}
+            <span aria-hidden="true"><GameIcon name={it.icon} /></span> {it.title}
           </p>
           <div className="gx-mseg">
             {it.options.map((o) => (
@@ -667,7 +671,7 @@ function MiniWheel({ mini, send }: { mini: MiniGameView; send: Send }) {
           <button key={o.id} className={`gx-mopt risk-${k}${mini.answers[it.id] === o.id ? ' on' : ''}`} disabled={!!o.locked} onClick={() => void send({ type: 'mini', item: it.id, option: o.id })}>
             <span>{o.label}</span>
             <small>{o.hint}</small>
-            {o.locked && <small className="gx-lock">🔒 {o.locked}</small>}
+            {o.locked && <small className="gx-lock"><GameIcon name="lock" /> {o.locked}</small>}
           </button>
         ))}
       </div>
@@ -693,7 +697,7 @@ function Report({ year }: { year: YearView }) {
       <ul>
         {r.lines.map((l, i) => (
           <li key={i} className={`tone-${l.tone}`} style={{ animationDelay: `${i * 90}ms` }}>
-            <span aria-hidden="true">{l.emoji}</span>
+            <span aria-hidden="true"><GameIcon name={l.icon} /></span>
             <p>{l.text}</p>
           </li>
         ))}
@@ -704,13 +708,13 @@ function Report({ year }: { year: YearView }) {
 
 // ================================================================= Résultats
 
-function Outcome({ o, kicker }: { o: { emoji: string; title: string; text: string; tone: string }; kicker: string }) {
+function Outcome({ o, kicker }: { o: { icon: string; title: string; text: string; tone: string }; kicker: string }) {
   return (
     <section className={`gx-outcome tone-${o.tone}`}>
       {o.tone === 'good' && <Confetti />}
       <p className="gx-kicker">{kicker}</p>
       <span className="gx-outcome-emoji" aria-hidden="true">
-        {o.emoji}
+        <GameIcon name={o.icon} />
       </span>
       <h1>{o.title}</h1>
       <p>{o.text}</p>
@@ -735,7 +739,7 @@ function Parcoursup({ ps }: { ps: ParcoursupView }) {
   if (!ps.eligible) return <LookUp c={null} text="Sans le bac, pas de Parcoursup : tu entres directement dans la vie active." />;
   if (ps.phase === 'wishes') return <Wishes ps={ps} />;
   if (ps.phase === 'results') return <PsResults ps={ps} />;
-  if (ps.final) return <Outcome o={{ emoji: ps.final.emoji, title: ps.final.label, text: ps.final.text, tone: ps.final.formation ? 'good' : 'bad' }} kicker="Ton affectation" />;
+  if (ps.final) return <Outcome o={{ icon: ps.final.icon, title: ps.final.label, text: ps.final.text, tone: ps.final.formation ? 'good' : 'bad' }} kicker="Ton affectation" />;
   return <Suspense text="Les affectations tombent…" />;
 }
 
@@ -758,14 +762,14 @@ function Wishes({ ps }: { ps: ParcoursupView }) {
   };
   return (
     <section className="gx-card">
-      <p className="gx-kicker">🎓 Parcoursup · {wishes.length}/{LIMITS.wishesMax} vœux</p>
+      <p className="gx-kicker"><GameIcon name="graduation" /> Parcoursup · {wishes.length}/{LIMITS.wishesMax} vœux</p>
       <ol className="gx-wishes">
         {wishes.map((id, i) => {
           const f = byId.get(id)!;
           return (
             <li key={id}>
               <b>{i + 1}</b>
-              <span aria-hidden="true">{f?.emoji}</span>
+              <span aria-hidden="true"><GameIcon name={f?.icon} /></span>
               <span className="gx-wish-label">{f?.label}</span>
               <span className="gx-wish-tools">
                 <button onClick={() => move(i, -1)} disabled={i === 0 || ps.submitted} aria-label="Monter">
@@ -791,7 +795,7 @@ function Wishes({ ps }: { ps: ParcoursupView }) {
             <li key={f.id} className={f.locked ? 'locked' : inList ? 'in' : ''}>
               <button disabled={!!f.locked || inList || wishes.length >= LIMITS.wishesMax || ps.submitted} onClick={() => update([...wishes, f.id])}>
                 <span className="gx-option-emoji" aria-hidden="true">
-                  {f.locked ? '🔒' : f.emoji}
+                  <GameIcon name={f.locked ? 'lock' : f.icon} />
                 </span>
                 <span>
                   <strong>{f.label}</strong>
@@ -839,11 +843,11 @@ function PsResults({ ps }: { ps: ParcoursupView }) {
   const waiting = ps.results.some((r) => r.status === 'attente');
   return (
     <section className="gx-card">
-      <p className="gx-kicker">🎓 Parcoursup · tes réponses</p>
+      <p className="gx-kicker"><GameIcon name="graduation" /> Parcoursup · tes réponses</p>
       <ul className="gx-results">
         {ps.results.map((r) => (
           <li key={r.formation} className={`st-${r.status}${ps.response === r.formation ? ' chosen' : ''}`}>
-            <span aria-hidden="true">{r.emoji}</span>
+            <span aria-hidden="true"><GameIcon name={r.icon} /></span>
             <span className="gx-wish-label">{r.label}</span>
             <span className={`gx-badge ${r.status}`}>
               {STATUS_LABEL[r.status]}
@@ -859,7 +863,7 @@ function PsResults({ ps }: { ps: ParcoursupView }) {
           {offers.map((o) => (
             <button key={o.formation} className={`gx-option${ps.response === o.formation ? ' on' : ''}`} onClick={() => void send({ type: 'response', accept: o.formation })}>
               <span className="gx-option-emoji" aria-hidden="true">
-                ✅
+                <GameIcon name="check" />
               </span>
               <span>
                 <strong>Accepter définitivement : {o.label}</strong>
@@ -869,7 +873,7 @@ function PsResults({ ps }: { ps: ParcoursupView }) {
           ))}
           <button className={`gx-option${ps.response === 'wait' ? ' on' : ''}`} onClick={() => void send({ type: 'response', accept: null })}>
             <span className="gx-option-emoji" aria-hidden="true">
-              ⏳
+              <GameIcon name="hourglass" />
             </span>
             <span>
               <strong>Garder mes offres et attendre mieux</strong>
@@ -888,11 +892,11 @@ function PsResults({ ps }: { ps: ParcoursupView }) {
 
 function Jobs({ jobs }: { jobs: JobsView }) {
   const { send, error } = useSend();
-  if (jobs.phase === 'result' && jobs.result) return <Outcome o={{ emoji: jobs.result.job === 'chomage' ? '📉' : '💼', title: jobs.result.label, text: jobs.result.text, tone: jobs.result.tone }} kicker="Ton premier emploi" />;
+  if (jobs.phase === 'result' && jobs.result) return <Outcome o={{ icon: jobs.result.job === 'chomage' ? 'trend-down' : 'briefcase', title: jobs.result.label, text: jobs.result.text, tone: jobs.result.tone }} kicker="Ton premier emploi" />;
   if (jobs.phase === 'result') return <Suspense text="Les recruteurs étudient les dossiers…" />;
   return (
     <section className="gx-card">
-      <p className="gx-kicker">💼 Premier emploi · ta stratégie</p>
+      <p className="gx-kicker"><GameIcon name="briefcase" /> Premier emploi · ta stratégie</p>
       <div className="gx-meter" aria-label={`Employabilité ${jobs.employability} sur 100`}>
         <span>Ton employabilité</span>
         <span className="gx-meter-bar">
@@ -905,7 +909,7 @@ function Jobs({ jobs }: { jobs: JobsView }) {
         {jobs.options.map((o) => (
           <button key={o.id} className={`gx-option${jobs.choice === o.id ? ' on' : ''}${o.locked ? ' locked' : ''}`} disabled={!!o.locked} onClick={() => void send({ type: 'job', optionId: o.id })}>
             <span className="gx-option-emoji" aria-hidden="true">
-              {o.locked ? '🔒' : o.emoji}
+              <GameIcon name={o.locked ? 'lock' : o.icon} />
             </span>
             <span>
               <strong>{o.label}</strong>
@@ -939,7 +943,7 @@ function Final({ f, c }: { f: NonNullable<PlayerGameView['final']>; c: Character
         <i aria-hidden="true">{move > 0 ? '↗' : move < 0 ? '↘' : '→'}</i>
         <span data-cls={f.cls}>
           {CLASS_SHORT[f.cls]}
-          {f.ascending && ' ⭐'}
+          {f.ascending && <> <GameIcon name="star" weight="fill" /></>}
         </span>
       </div>
       <p className="gx-lead">{f.text}</p>
@@ -964,7 +968,7 @@ function Final({ f, c }: { f: NonNullable<PlayerGameView['final']>; c: Character
 
 // ================================================================= Mon parcours
 
-const PATH_ICON = { title: '🏅', open: '🔓', close: '🔒', event: '⚡', choice: '•' } as const;
+const PATH_ICON = { title: 'medal', open: 'unlock', close: 'lock', event: 'bolt', choice: 'dot' } as const;
 
 function PathTab({ c }: { c: CharacterView }) {
   const { user } = useSession();
@@ -1002,7 +1006,7 @@ function PathTab({ c }: { c: CharacterView }) {
           </li>
         ))}
       </ol>
-      <p className="gx-legend">🔓 porte ouverte · 🔒 porte fermée · 🏅 titre obtenu · ⚡ coup du sort</p>
+      <p className="gx-legend"><GameIcon name="unlock" /> porte ouverte · <GameIcon name="lock" /> porte fermée · <GameIcon name="medal" /> titre obtenu · <GameIcon name="bolt" /> coup du sort</p>
     </section>
   );
 }

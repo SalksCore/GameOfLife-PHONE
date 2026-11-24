@@ -30,7 +30,7 @@ export const fr = {
   'login.help': 'Pas encore de compte ? Tes identifiants te sont remis par l’organisateur.',
   'login.failed': 'Connexion impossible',
 
-  'home.hello': 'Salut {name} 👋',
+  'home.hello': 'Salut {name}',
   'home.subtitle': 'Entre le code donné par l’organisateur pour rejoindre la salle.',
   'home.join': 'Rejoindre une partie',
   'home.profile': 'Mon profil',

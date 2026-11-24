@@ -504,3 +504,16 @@ html[data-power-saver='true'] .gx * { animation: none !important; }
 .pair-code input { flex: 1; min-width: 0; min-height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--line-strong); background: var(--surface-2); color: var(--text); font-size: 17px; letter-spacing: 0.12em; }
 .pair-code input:focus { outline: none; border-color: var(--life); }
 .pair-code .btn.small { min-height: 44px; width: auto; padding: 0 16px; }
+
+/* Icônes de contenu (Phosphor) : conteneurs carrés, teinte sobre, taille suivant font-size */
+.gx-option-emoji, .gx-cat-emoji, .gx-mini-emoji, .gx-mcard-emoji, .gx-outcome-emoji, .situation-emoji, .choice-emoji,
+.activity-emoji, .action-emoji, .event-emoji {
+  display: inline-grid;
+  place-items: center;
+  color: var(--accent);
+  line-height: 1;
+}
+.gx-outcome-emoji { font-size: 56px; margin-bottom: 4px; }
+.gx-mcard-emoji { font-size: 40px; }
+.gx-option-emoji { height: 34px; }
+.gx-fcard-list svg, .gx-kicker svg, .gx-lock svg, .warn svg { vertical-align: -0.14em; margin-right: 2px; }
