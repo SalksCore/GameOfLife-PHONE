@@ -500,3 +500,7 @@ html[data-power-saver='true'] .gx * { animation: none !important; }
 .gx-mopt.risk-0.on { border-color: #5fd68f; }
 .gx-mopt.risk-1.on { border-color: #ffc94d; background: color-mix(in srgb, #ffc94d 12%, var(--surface)); }
 .gx-mopt.risk-2.on { border-color: #ff6b5b; background: color-mix(in srgb, #ff6b5b 12%, var(--surface)); }
+.pair-code { display: flex; gap: 8px; }
+.pair-code input { flex: 1; min-width: 0; min-height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--line-strong); background: var(--surface-2); color: var(--text); font-size: 17px; letter-spacing: 0.12em; }
+.pair-code input:focus { outline: none; border-color: var(--life); }
+.pair-code .btn.small { min-height: 44px; width: auto; padding: 0 16px; }

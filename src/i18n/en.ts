@@ -121,6 +121,9 @@ export const en: Record<keyof typeof fr, string> = {
   'profile.fullName': 'Name',
   'profile.inGameName': 'In-game name',
   'profile.memberSince': 'Member since',
+  'profile.pairCode': 'Pair code',
+  'profile.pairCodeHint': 'Give it to your partner if you play together on their phone.',
+  'login.qrFailed': 'The QR code on your sheet is no longer valid: type your username and password, or ask for a new sheet.',
   'profile.logoutConfirm': 'Log out from this device?',
   'profile.managedBy': 'Your account is managed by the host. Ask them to change your name or password.',
 

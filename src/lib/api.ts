@@ -19,6 +19,8 @@ export interface User {
   color: string;
   gamesPlayed: number;
   createdAt: string;
+  /** Code binôme personnel (imprimé sur la fiche) */
+  pairCode?: string | null;
 }
 
 interface Session {

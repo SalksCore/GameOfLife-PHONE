@@ -127,6 +127,15 @@ export function ProfileScreen({ user: initial, onUpdated }: { user: User; onUpda
           <span>{t('profile.inGameName')}</span>
           <strong>{user.displayName}</strong>
         </div>
+        {user.pairCode && (
+          <div className="list-row" title={t('profile.pairCodeHint')}>
+            <Icon name="users" />
+            <span>{t('profile.pairCode')}</span>
+            <strong className="mono">
+              {user.pairCode.slice(0, 3)}-{user.pairCode.slice(3)}
+            </strong>
+          </div>
+        )}
         <div className="list-row">
           <Icon name="calendar" />
           <span>{t('profile.memberSince')}</span>

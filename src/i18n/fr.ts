@@ -119,6 +119,9 @@ export const fr = {
   'profile.fullName': 'Nom',
   'profile.inGameName': 'Nom en jeu',
   'profile.memberSince': 'Membre depuis',
+  'profile.pairCode': 'Code binôme',
+  'profile.pairCodeHint': 'À donner à ton partenaire s’il joue sur son téléphone pour vous deux.',
+  'login.qrFailed': 'Le QR code de ta fiche n’est plus valable : tape ton identifiant et ton mot de passe, ou demande une nouvelle fiche.',
   'profile.logoutConfirm': 'Te déconnecter de cet appareil ?',
   'profile.managedBy': 'Ton compte est géré par l’organisateur. Pour changer de nom ou de mot de passe, demande-lui.',
 

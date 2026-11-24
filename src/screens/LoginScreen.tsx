@@ -6,6 +6,7 @@ import { LifeGrid } from '../components/LifeGrid';
 import { LogoMark } from '../components/Logo';
 import { useI18n } from '../i18n';
 import { ApiError, login } from '../lib/api';
+import { qrLoginFailed } from '../lib/session';
 import { useStatus } from '../lib/status';
 
 /** Connexion joueur. Pas d'inscription : les comptes sont fournis par l'organisateur. */
@@ -90,9 +91,9 @@ export function LoginScreen() {
           </div>
         </label>
 
-        {error && (
+        {(error || qrLoginFailed) && (
           <p className="alert alert-error" role="alert">
-            {error}
+            {error ?? t('login.qrFailed')}
           </p>
         )}
 
