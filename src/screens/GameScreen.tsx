@@ -967,6 +967,7 @@ function Final({ f, c }: { f: NonNullable<PlayerGameView['final']>; c: Character
 const PATH_ICON = { title: '🏅', open: '🔓', close: '🔒', event: '⚡', choice: '•' } as const;
 
 function PathTab({ c }: { c: CharacterView }) {
+  const { user } = useSession();
   const groups: { year: string; items: CharacterView['path'] }[] = [];
   for (const p of c.path) {
     const g = groups.at(-1);
@@ -976,7 +977,7 @@ function PathTab({ c }: { c: CharacterView }) {
   return (
     <section className="gx-path">
       <header className="gx-card gx-path-head">
-        <Avatar avatar="🧭" color="violet" size="sm" />
+        {user && <Avatar avatar={user.avatar} color={user.color} size="sm" />}
         <div>
           <strong>{c.status}</strong>
           <small>

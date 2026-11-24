@@ -1,4 +1,6 @@
-/** Pastille avatar : emoji du joueur sur sa couleur (motif ajouté en mode daltonien). */
+import { Portrait } from './Portrait';
+
+/** Pastille ronde du portrait d'un joueur, sur sa couleur (motif ajouté en mode daltonien). */
 export function Avatar({
   avatar,
   color,
@@ -12,7 +14,7 @@ export function Avatar({
 }) {
   return (
     <span className={`avatar avatar-${size}${offline ? ' offline' : ''}`} data-color={color} aria-hidden="true">
-      <span className="avatar-emoji">{avatar}</span>
+      <Portrait code={avatar} />
     </span>
   );
 }
