@@ -347,7 +347,7 @@ function FamilyCard({ c }: { c: CharacterView }) {
         <span className="gx-fcard-back" aria-hidden={flipped}>
           <span className="gx-fcard-dice"><GameIcon name="dice" /></span>
           <strong>Ta famille</strong>
-          <small>Touche pour découvrir où tu es né·e</small>
+          <small>Touche pour découvrir d’où tu pars</small>
         </span>
         <span className="gx-fcard-front" aria-hidden={!flipped}>
           <span className="gx-fcard-class">{CLASS_LABELS[c.origin]}</span>
@@ -686,7 +686,7 @@ function Report({ year }: { year: YearView }) {
   return (
     <section className="gx-report">
       <header>
-        <p className="gx-kicker">Bulletin · {r.title}</p>
+        <p className="gx-kicker">Bilan · {r.title}</p>
         <div className="gx-report-grade">
           <strong>{grade(r.grade)}</strong>
           <span>/20</span>
@@ -835,7 +835,7 @@ function Wishes({ ps }: { ps: ParcoursupView }) {
   );
 }
 
-const STATUS_LABEL = { admis: 'Admis·e', attente: 'En attente', refuse: 'Refusé·e' } as const;
+const STATUS_LABEL = { admis: 'Admis', attente: 'En attente', refuse: 'Refus' } as const;
 
 function PsResults({ ps }: { ps: ParcoursupView }) {
   const { send, error } = useSend();
@@ -857,7 +857,7 @@ function PsResults({ ps }: { ps: ParcoursupView }) {
         ))}
       </ul>
       {!offers.length ? (
-        <Hint>{waiting ? 'Aucune offre pour l’instant, mais tu es en liste d’attente : des places vont se libérer.' : 'Refusé·e partout. Phase complémentaire : tu prendras une place qui reste.'}</Hint>
+        <Hint>{waiting ? 'Aucune offre pour l’instant, mais tu es en liste d’attente : des places vont se libérer.' : 'Refus partout. Phase complémentaire : tu prendras une place qui reste.'}</Hint>
       ) : (
         <div className="gx-options">
           {offers.map((o) => (
@@ -986,7 +986,7 @@ function PathTab({ c }: { c: CharacterView }) {
           <strong>{c.status}</strong>
           <small>
             {CLASS_LABELS[c.origin]} · {c.school.name}
-            {c.boursier && ' · boursier·e'}
+            {c.boursier && ' · bourse'}
             {c.partner && ` · en binôme avec ${c.partner}`}
           </small>
         </div>
