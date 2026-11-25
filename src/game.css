@@ -21,7 +21,7 @@
   gap: 8px;
   padding: 26px 16px 20px;
   border-radius: var(--r-xl);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--pc) 20%, var(--surface)) 0%, var(--surface) 80%);
+  background: color-mix(in srgb, var(--pc) 10%, var(--surface));
   border: 1px solid var(--line-strong);
   text-align: center;
 }

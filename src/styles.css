@@ -28,7 +28,7 @@
   --r-md: 14px;
   --r-lg: 18px;
   --r-xl: 24px;
-  --shadow: 0 12px 28px -14px rgba(0, 0, 0, 0.7);
+  --shadow: none;
   --tabbar-h: 68px;
   --gutter: 16px;
 
@@ -252,10 +252,8 @@ button:disabled {
 .btn-primary {
   background: var(--life);
   color: var(--life-ink);
-  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.2);
 }
 .btn-primary:not(:disabled):active {
-  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.2);
 }
 .btn-ghost {
   background: var(--surface-2);
@@ -451,11 +449,8 @@ html[data-color-blind='true'] .avatar::after {
   grid-template-columns: repeat(3, 1fr);
   padding: 6px;
   border-radius: 22px;
-  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  background: var(--surface);
   border: 1px solid var(--line-strong);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.8);
 }
 .tab {
   display: grid;
@@ -761,7 +756,6 @@ html[data-color-blind='true'] .avatar::after {
   border-color: var(--life);
   color: var(--life-ink);
   transform: translateY(-2px);
-  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.2);
 }
 .code-boxes:focus-within .code-box.current {
   border-color: var(--life);
@@ -783,7 +777,7 @@ html[data-color-blind='true'] .avatar::after {
   padding: 26px 16px 22px;
   text-align: center;
   border-radius: var(--r-xl);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--pc) 20%, var(--surface)) 0%, var(--surface) 80%);
+  background: color-mix(in srgb, var(--pc) 10%, var(--surface));
   border: 1px solid var(--line-strong);
   box-shadow: var(--shadow);
 }
@@ -966,7 +960,7 @@ html[data-color-blind='true'] .avatar::after {
   display: grid;
   place-items: center;
   color: transparent;
-  background: linear-gradient(160deg, var(--pc), var(--pc-2));
+  background: var(--pc);
   transition: transform 0.12s;
 }
 .pick-color:active {
@@ -1209,7 +1203,6 @@ html[data-color-blind='true'] .avatar::after {
   font-family: var(--font-display);
   font-size: clamp(1.4rem, 6.5vw, 1.75rem);
   font-weight: 700;
-  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.2);
 }
 .share-hint {
   display: inline-flex;
