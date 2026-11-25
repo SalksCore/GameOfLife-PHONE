@@ -999,7 +999,7 @@ function PathTab({ c }: { c: CharacterView }) {
             <ul>
               {g.items.map((p, k) => (
                 <li key={k} className={`k-${p.kind}`}>
-                  <span aria-hidden="true">{PATH_ICON[p.kind]}</span> {p.text}
+                  <span aria-hidden="true"><GameIcon name={PATH_ICON[p.kind]} /></span> {p.text}
                 </li>
               ))}
             </ul>
